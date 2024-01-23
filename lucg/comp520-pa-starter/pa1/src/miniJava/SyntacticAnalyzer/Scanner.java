@@ -9,6 +9,7 @@ public class Scanner {
 	private ErrorReporter _errors;
 	private StringBuilder _currentText;
 	private char _currentChar;
+	private boolean eot = false;
 	
 	public Scanner( InputStream in, ErrorReporter errors ) {
 		this._in = in;
@@ -47,12 +48,14 @@ public class Scanner {
 			int c = _in.read();
 			_currentChar = (char)c;
 			
-			// TODO: What happens if c == -1?
+			if (c == -1) {
+				eot = true;
+			}
 			
 			// TODO: What happens if c is not a regular ASCII character?
 			
 		} catch( IOException e ) {
-			// TODO: Report an error here
+			scanError("I/O Exception!");
 		}
 	}
 	
@@ -60,5 +63,10 @@ public class Scanner {
 		// TODO: return a new Token with the appropriate type and text
 		//  contained in 
 		return null;
+	}
+
+	private void scanError(String m) {
+		// i need to provde line and colum numbers. how? 
+		_errors.reportError(0,0, "Scan Error:  " + m);
 	}
 }
