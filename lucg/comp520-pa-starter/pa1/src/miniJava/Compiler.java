@@ -12,24 +12,13 @@ import miniJava.SyntacticAnalyzer.Scanner;
 public class Compiler {
 	// Main function, the file to compile will be an argument.
 	public static void main(String[] args) {
-		// TODO: Instantiate the ErrorReporter object
-		
-		// TODO: Check to make sure a file path is given in args
-		
-		// TODO: Create the inputStream using new FileInputStream
-		
-		// TODO: Instantiate the scanner with the input stream and error object
-		
-		// TODO: Instantiate the parser with the scanner and error object
-		
-		// TODO: Call the parser's parse function
-		
-		// TODO: Check if any errors exist, if so, println("Error")
-		//  then output the errors
-		
-		// TODO: If there are no errors, println("Success")
 
-		int rc = 4;
+		ErrorReporter errorReporter = new ErrorReporter();
+
+		if (args.length < 1) {
+			System.exit(1);
+		}
+		
 		String sourceFilePath = args[0];
 		
 		if (!(sourceFilePath.endsWith(".java") || sourceFilePath.endsWith(".mjava"))) {
@@ -38,15 +27,15 @@ public class Compiler {
 		
 		InputStream sourceFileStream = readFile(sourceFilePath);
 		BufferedInputStream bufferedStream = new BufferedInputStream(sourceFileStream);
-		ErrorReporter errorReporter = new ErrorReporter();
 		Scanner scanner = new Scanner(bufferedStream, errorReporter);
 		Parser parser = new Parser(scanner, errorReporter);
 		parser.parse();
 		if (!errorReporter.hasErrors()) {
-			rc = 0;
+			System.out.println("Error");
+			errorReporter.outputErrors();
+		} else {
+			System.out.println("Success");
 		}
-				
-		System.exit(rc);
 	}
 
 	private static InputStream readFile(String sourceFilePath) {

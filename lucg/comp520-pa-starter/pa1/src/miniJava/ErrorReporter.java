@@ -3,10 +3,6 @@ package miniJava;
 import java.util.List;
 import java.util.ArrayList;
 
-// TODO: Note this class lacks a lot of things.
-//  First of all, errors are simple strings,
-//  perhaps it may be worthwhile to augment this reporter
-//  with requiring line numbers.
 public class ErrorReporter {
 	private List<String> _errorQueue;
 	
@@ -15,43 +11,26 @@ public class ErrorReporter {
 	}
 	
 	public boolean hasErrors() {
-		// TODO: Check if errorQueue is non-empty
-		return false;
+		if (this._errorQueue.isEmpty()) {
+			return false;
+		} else {
+			return true;
+		}
 	}
 	
 	public void outputErrors() {
-		// TODO: output all errors in the errorQueue
+		for (String string : _errorQueue) {
+			System.out.println(string);
+		}
 	}
 	
-	public void reportError(String ...error) {
+	public void reportError(int lineNumber, int columnNumber, String ...error) {
 		StringBuilder sb = new StringBuilder();
+		sb.append(String.format("line number: %d column number: %d ->\n", lineNumber, columnNumber));
 		
 		for(String s : error)
-			sb.append(s);
+			sb.append("\t" + s);
 		
 		_errorQueue.add(sb.toString());
 	}
 }
-
-/*
-package miniJava;
-
-public class ErrorReporter {
-	
-	private int numErrors;
-
-	ErrorReporter() {
-		numErrors = 0;
-	}
-
-	public boolean hasErrors() {
-		return numErrors > 0;
-	}
-
-	public void reportError(String message) {
-		System.out.println(message);
-		numErrors++;
-	}	
-}
-
-*/

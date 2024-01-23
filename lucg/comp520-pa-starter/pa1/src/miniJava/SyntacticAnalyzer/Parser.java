@@ -26,6 +26,7 @@ public class Parser {
 	
 	// Program ::= (ClassDeclaration)* eot
 	private void parseProgram() throws SyntaxError {
+		this._currentToken = this._scanner.scan();
 		// TODO: Keep parsing class declarations until eot
 	}
 	
