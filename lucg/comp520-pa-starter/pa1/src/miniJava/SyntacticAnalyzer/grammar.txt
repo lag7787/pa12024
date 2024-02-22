@@ -1,5 +1,35 @@
+	Statement ::=
+	{Statement*}
+	| ( int ('' | []) | boolean) id = Expression ;
+	| id (
+		| id = Expression ;
+		| = Expression ;
+		| [] id = Expression ;
+		| [ Expression ] = Expression ;
+		| (ArugmentList?) ;
+		| .id (.id)* J
+		)
+	| this (.id)* J
+	| return Expression? ; 
+	| if ( Expression ) Statement ( else Statement ) ?
+	| while ( Expression ) Statement
 
+	Expression ::=
+        ( Id | this ) ( . id )* (  | [ Expression ] | '('(Expression ( , Expression )*)? ')' )
+		| unop Expression
+		| ( Expression )
+		| num | true | false | new ( id() | … | … )
+		(binop Expression)*
 
-terminals: eot, class, id, void, (access modifier) {public private}, 
+Expression ::=
+    ((Id | this) (. id )*) ("" | [ Expression ] | ( ArgumentList? ) )
+    | unop Expression
+    | ( Expression )
+    | num | true | false
+    | new ( id() | int [ Expression ] | id [ Expression ] )
+    (binop Expression)*
 
-all tokens of the same kind can be freely interchanged without adjusting the phrase structure of the sentence. Phrase structure here i assunme referes to a sentece create in alignment with the grammar 
+Starters(Expression) = num, true, false, new, unop,  "(" , ID, this
+
+ParameterList ::= Type id ( , Type id )* 
+Type ::= int | boolean | id | (int|id) []

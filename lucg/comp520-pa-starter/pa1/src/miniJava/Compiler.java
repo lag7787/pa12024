@@ -6,8 +6,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
-import miniJava.SyntacticAnalyzer.Parser;
 import miniJava.SyntacticAnalyzer.Scanner;
+import miniJava.AbstractSyntaxTrees.AST;
+import miniJava.AbstractSyntaxTrees.ASTDisplay;
+import miniJava.SyntacticAnalyzer.Parser;
+import miniJava.SyntacticAnalyzer.Token;
+import miniJava.SyntacticAnalyzer.TokenType;
 
 public class Compiler {
 	// Main function, the file to compile will be an argument.
@@ -29,12 +33,13 @@ public class Compiler {
 		BufferedInputStream bufferedStream = new BufferedInputStream(sourceFileStream);
 		Scanner scanner = new Scanner(bufferedStream, errorReporter);
 		Parser parser = new Parser(scanner, errorReporter);
-		parser.parse();
-		if (!errorReporter.hasErrors()) {
+		AST programAST = parser.parse();
+		if (errorReporter.hasErrors()) {
 			System.out.println("Error");
 			errorReporter.outputErrors();
 		} else {
-			System.out.println("Success");
+			ASTDisplay display = new ASTDisplay();
+			display.showTree(programAST);
 		}
 	}
 

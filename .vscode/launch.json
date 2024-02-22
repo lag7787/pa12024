@@ -1,0 +1,61 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Gradescope Test",
+            "request": "launch",
+            "mainClass": "miniJava.Compiler",
+            "projectName": "pa12024_750a78fc",
+            "args": "/home/lucgarabrant/Documents/Projects/pa12024/lucg/comp520-pa-starter/pa1/pa2_tests_partial/pass219.java"
+        },
+        {
+            "type": "java",
+            "name": "Compiler Test 4",
+            "request": "launch",
+            "mainClass": "miniJava.Compiler",
+            "projectName": "pa12024_750a78fc",
+            "args": "/home/lucgarabrant/Documents/Projects/pa12024/lucg/comp520-pa-starter/pa1/src/miniJava/test_files/test4.mjava"
+        },
+        {
+            "type": "java",
+            "name": "Compiler Test 3",
+            "request": "launch",
+            "mainClass": "miniJava.Compiler",
+            "projectName": "pa12024_750a78fc",
+            "args": "/home/lucgarabrant/Documents/Projects/pa12024/lucg/comp520-pa-starter/pa1/src/miniJava/test_files/test3.mjava"
+        },
+        {
+            "type": "java",
+            "name": "Compiler Test 1",
+            "request": "launch",
+            "mainClass": "miniJava.Compiler",
+            "projectName": "pa12024_750a78fc",
+            "args": "/home/lucgarabrant/Documents/Projects/pa12024/lucg/comp520-pa-starter/pa1/src/miniJava/test_files/test1.mjava"
+        },
+        {
+            "type": "java",
+            "name": "Compiler Test 2",
+            "request": "launch",
+            "mainClass": "miniJava.Compiler",
+            "projectName": "pa12024_750a78fc",
+            "args": "/home/lucgarabrant/Documents/Projects/pa12024/lucg/comp520-pa-starter/pa1/src/miniJava/test_files/test2.mjava"
+        },
+        {
+            "type": "java",
+            "name": "Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "test",
+            "request": "launch",
+            "mainClass": "miniJava.test_files.test",
+            "projectName": "pa12024_750a78fc"
+        }
+    ]
+}

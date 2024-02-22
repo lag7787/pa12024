@@ -2,6 +2,8 @@ package miniJava.SyntacticAnalyzer;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+
 import miniJava.ErrorReporter;
 
 public class Scanner {
@@ -10,18 +12,46 @@ public class Scanner {
 	private StringBuilder _currentText;
 	private char _currentChar;
 	private boolean eot = false;
+	private int rowNumber = 1;
+	private int columnNumber = 0;
+
+	private static HashMap<String, TokenType> keywordMap;
 	
+	static {
+		keywordMap = new HashMap<String, TokenType>();
+	    keywordMap.put("class", TokenType.CLASS);
+	    keywordMap.put("public", TokenType.PUBLIC);
+	    keywordMap.put("private", TokenType.PRIVATE);
+	    keywordMap.put("void", TokenType.VOID);
+	    keywordMap.put("static", TokenType.STATIC);
+	    keywordMap.put("int", TokenType.INT);
+	    keywordMap.put("boolean", TokenType.BOOLEAN);
+	    keywordMap.put("this", TokenType.THIS);
+	    keywordMap.put("return", TokenType.RETURN);
+	    keywordMap.put("if", TokenType.IF);
+	    keywordMap.put("else", TokenType.ELSE);
+	    keywordMap.put("while", TokenType.WHILE);
+	    keywordMap.put("true", TokenType.TRUE);
+	    keywordMap.put("false", TokenType.FALSE);
+	    keywordMap.put("new", TokenType.NEW);
+	    //keywordMap.put("=", TokenType.ASSIGNMENT);
+		// not sure we need this 
+	}
+
 	public Scanner( InputStream in, ErrorReporter errors ) {
 		this._in = in;
 		this._errors = errors;
-		this._currentText = new StringBuilder();
-		
 		nextChar();
 	}
 	
 	public Token scan() {
+		this._currentText = new StringBuilder();
 		skipSeparators();
+		TokenType kind = scanToken();
+		return makeToken(kind);
+
 		// TODO: This function should check the current char to determine what the token could be.
+		// must be a token if weve skipped seperators
 		
 		// TODO: What happens if there are no more tokens?
 		// how do we know if there are no more tokens? 
@@ -30,7 +60,6 @@ public class Scanner {
 		// TODO: Determine what the token is. For example, if it is a number
 		//  keep calling takeIt() until _currentChar is not a number. Then
 		//  create the token via makeToken(TokenType.IntegerLiteral) and return it.
-		return null;
 	}
 	
 	private void takeIt() {
@@ -46,6 +75,10 @@ public class Scanner {
 		// could check two characters??
 		switch (_currentChar) {
 		case ' ': case '\t': case '\r': case '\n':
+			if (_currentChar == '\n') {
+				this.rowNumber++;
+				this.columnNumber = 0;
+			}
 			skipIt();
 			skipSeparators();
 			break;
@@ -58,8 +91,15 @@ public class Scanner {
 				char previousChar = _currentChar;
 				skipIt();
 				while (!(eot || (previousChar == '*' && _currentChar == '/'))) {
+					if (_currentChar == '\n') {
+						this.rowNumber++;
+						this.columnNumber = 0;
+					}
 					previousChar = _currentChar;
 					skipIt();
+				}
+				if (eot) {
+					scanError("Comment was never terminated");
 				}
 				skipIt();
 			} else if (_currentChar == '/') {
@@ -67,11 +107,17 @@ public class Scanner {
 				while (!(eot || _currentChar == '\n' || _currentChar == '\r')) {
 					skipIt();
 				}
+				if (_currentChar == '\n') {
+					this.rowNumber++;
+					this.columnNumber = 0;
+				}
 				skipIt();
 			} else {
 				_currentChar = '/';
+				this.columnNumber--;
 				try {
 					_in.reset();
+					eot = false;
 				} catch (IOException e) {
 					scanError(e.toString());
 				}
@@ -98,6 +144,8 @@ public class Scanner {
 				eot = true;
 			}
 
+			columnNumber++;
+
 			_currentChar = (char)c;
 			
 		} catch( IOException e ) {
@@ -105,13 +153,14 @@ public class Scanner {
 		}
 	}
 
-	public TokenKind scanToken() {
-		
+	public TokenType scanToken() {
+
+		// some inconsistencies with marking EOT when using mark
 		if (eot)
-			return(TokenKind.EOT); 
+			return(TokenType.EOT); 
 
 		// scan Token
-		switch (currentChar) {
+		switch (_currentChar) {
 		case 'a': case 'b': case 'c': case 'd': case 'e': case 'f': case 'g': case 'h': case 'i':case 'j':
 		case 'k': case 'l': case 'm': case 'n': case 'o': case 'p': case 'q': case 'r': case 's': case 't':
 		case 'u': case 'v': case 'w': case 'x': case 'y': case 'z':
@@ -119,98 +168,98 @@ public class Scanner {
 		case 'K': case 'L': case 'M': case 'N': case 'O': case 'P': case 'Q': case 'R': case 'S': case 'T':
 		case 'U': case 'V': case 'W': case 'X': case 'Y': case 'Z':
 			takeIt();
-			while (Character.isLetter(currentChar) || 
-					Character.isDigit(currentChar) || 
-					currentChar == '_')
-				takeIt();
-			if (keywordMap.containsKey(this.currentSpelling.toString().toLowerCase())) {
-				return keywordMap.get(this.currentSpelling.toString().toLowerCase());
+			while (Character.isLetter(_currentChar) || 
+					Character.isDigit(_currentChar) || 
+					_currentChar == '_') {
+						takeIt();
+					}
+			if (keywordMap.containsKey(this._currentText.toString())) {
+				return keywordMap.get(this._currentText.toString());
 			} else {
-				return TokenKind.IDENTIFIER;
+				return TokenType.IDENTIFIER;
 			}
-		//some characters require two character look ahead. 
-		//single = is not an operator, but a keyword 
 		case '+': case '-': case '*': case '/':
-		case '&': case '|': case '!':
-		case '>': case '<':
-			if (currentChar == '/') {
-				System.out.println();
-			}
-			char prevChar = currentChar;
+	//		if (_currentChar == '/') {
+	//			System.out.println(); // was i trying to handle something here? 
+	//		}
 			takeIt();
-			//were trying to decide if we should take a second char. 
-			switch (prevChar) {
-			case '>': case '<': case '!':
-				if (currentChar == '=')
-					takeIt();
-					break;
-			case '&': case '|':
-				if (currentChar == prevChar)
-					takeIt();
-					break;
+			return(TokenType.OPERATOR);
+		case '&': case '|':
+			char prevChar = _currentChar;
+			takeIt();
+			if (_currentChar == prevChar) {
+				takeIt();
+				return (TokenType.OPERATOR);
+			} else {
+				return (TokenType.ERROR);
 			}
-			return(TokenKind.OPERATOR);
+		case '>': case '<': case '!':
+			takeIt();
+			if (_currentChar == '=') {
+				takeIt();
+				return (TokenType.OPERATOR);
+			} else {
+				return (TokenType.OPERATOR);
+			}
+		case '=':
+			takeIt();
+			if (_currentChar == '=') {
+				takeIt();
+				return (TokenType.OPERATOR);
+			} else {
+				return TokenType.ASSIGNMENT;
+			}
 		case '0': case '1': case '2': case '3': case '4': case '5':
 		case '6': case '7': case '8': case  '9':
 			takeIt();
-			while (Character.isDigit(currentChar)) takeIt();
-			return TokenKind.NUMBER;
-		case '=':
-			takeIt();
-			if (currentChar == '=') {
-				takeIt();
-				return (TokenKind.OPERATOR);
-			} else {
-				return TokenKind.ASSIGNMENT;
-			}
-			
+			while (Character.isDigit(_currentChar)) takeIt();
+			return TokenType.NUMBER;
 		case '.':
 			takeIt();
-			return (TokenKind.DOT);
+			return (TokenType.DOT);
 		case '(': 
 			takeIt();
-			return(TokenKind.LPAREN);
+			return(TokenType.LPAREN);
 
 		case ')':
 			takeIt();
-			return(TokenKind.RPAREN);
+			return(TokenType.RPAREN);
 			
 		case '{': 
 			takeIt();
-			return(TokenKind.LBRACKET);
+			return(TokenType.LBRACKET);
 
 		case '}':
 			takeIt();
-			return(TokenKind.RBRACKET);
+			return(TokenType.RBRACKET);
 		case '[' :
 			takeIt();
-			return(TokenKind.SQLBRACKET);
+			return(TokenType.SQLBRACKET);
 		case ']':
 			takeIt();
-			return(TokenKind.SQRBRACKET);
-			
+			return(TokenType.SQRBRACKET);
 		case ';':
 			takeIt();
-			return(TokenKind.SEMICOLON);
+			return(TokenType.SEMICOLON);
 		case ',':
 			takeIt();
-			return(TokenKind.COMMA);
+			return(TokenType.COMMA);
 		
 		default:
-			scanError("Unrecognized character '" + currentChar + "' in input");
-			return(TokenKind.ERROR);
+			scanError("Unrecognized character '" + _currentChar + "' in input");
+			return(TokenType.ERROR);
 		}
-		
 	}
 	
-	private Token makeToken( TokenType toktype ) {
-		// TODO: return a new Token with the appropriate type and text
-		//  contained in 
-		return null;
+	private Token makeToken(TokenType tokenType) {
+		// can do a simple mathematical expression to determine wher ethe token starts based on the spelling
+		// can do a refactor such that single token characters span of syntax..
+		String spelling = this._currentText.toString();
+		return new Token(tokenType, spelling, this.rowNumber, this.columnNumber - spelling.length());
 	}
 
 	private void scanError(String m) {
 		// i need to provde line and colum numbers. how? 
-		_errors.reportError(0,0, "Scan Error:  " + m);
+		_errors.reportError(this.rowNumber,this.columnNumber, "Scan Error:  " + m);
 	}
 }

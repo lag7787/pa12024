@@ -1,5 +1,0 @@
-
-
-terminals: eot, class, id, void, (access modifier) {public private}, 
-
-all tokens of the same kind can be freely interchanged without adjusting the phrase structure of the sentence. Phrase structure here i assunme referes to a sentece create in alignment with the grammar 

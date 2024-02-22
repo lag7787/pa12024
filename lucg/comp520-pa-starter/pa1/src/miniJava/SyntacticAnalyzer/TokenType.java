@@ -17,22 +17,8 @@ package miniJava.SyntacticAnalyzer;
 public enum TokenType {
 	IDENTIFIER,
 	NUMBER,
-	GT,
-    LT,
-    EQ,
-    GTEQ,
-    LTEQ,
-    NOEQ,
-    AMP,
-    AMPAMP,
-    BAR,
-    BARBAR,
-    BANG,
+	OPERATOR,
 	LPAREN,
-    PLUS,
-    MINUS,
-    STAR,
-    SLASH,
 	RPAREN,
 	LBRACKET,
 	RBRACKET,
@@ -44,6 +30,7 @@ public enum TokenType {
 	PRIVATE,
 	VOID,
 	STATIC,
+	BOOLEAN,
 	INT,
 	TRUE,
     FALSE,
@@ -53,8 +40,11 @@ public enum TokenType {
 	ELSE,
 	WHILE,
 	NEW,
+	ASSIGNMENT,
 	SQLBRACKET,
 	SQRBRACKET,
 	DOT,
 	EOT
 }
+// gotta make sure our sqbrackets mean what we want them to
+//also need to check that parens are always in the right spot 
